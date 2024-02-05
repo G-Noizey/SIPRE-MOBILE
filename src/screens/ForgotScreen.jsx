@@ -1,3 +1,4 @@
+// ForgotScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -5,13 +6,13 @@ import { useNavigation } from '@react-navigation/native';
 import LogoComponent from '../components/LogoComponent';
 import InputField from '../components/InputFields';
 import ButtonComponent from '../components/ButtonComponent';
-
+import BackButtonComponent from '../components/BackButtonComponent';
 import * as Font from 'expo-font';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const LoginScreen = () => {
+const ForgotScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -42,15 +43,16 @@ const LoginScreen = () => {
     return null; // No renderizar nada si las fuentes no se han cargado
   }
 
-  const handleForgotPasswordPress = () => {
+  const handleBack = () => {
     // Lógica relacionada con la recuperación de contraseña aquí
 
-    // Después de realizar la lógica, redirige a ForgotPasswordScreen
-    navigation.navigate('ForgotScreen');
+    // Después de realizar la lógica, redirige a LoginScreen
+    navigation.navigate('Login');
   };
 
   return (
     <View style={styles.container}>
+
       <View style={styles.logo2Container}>
         <Image source={require('../../assets/images/logo2.png')} style={styles.logo2} />
       </View>
@@ -59,24 +61,21 @@ const LoginScreen = () => {
         <LogoComponent />
       </View>
 
-      <Text style={styles.loginText}>Iniciar Sesión</Text>
+      <Text style={styles.loginText}>Recuperación de contraseña</Text>
 
-      <InputField label="Usuario:" value={username} onChangeText={handleUsernameChange} placeholder="" />
+      <InputField label="Correo Electrónico:" value={username} onChangeText={handleUsernameChange} placeholder="" />
 
-      <InputField
-        label="Contraseña:"
-        value={password}
-        onChangeText={handlePasswordChange}
-        secureTextEntry={true}
-        placeholder=""
-      />
+        <View style={styles.div}>
 
-      <TouchableOpacity onPress={handleForgotPasswordPress}>
-        <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
-      </TouchableOpacity>
+        <ButtonComponent onPress={() => console.log('Botón presionado')} title="Solicitar" />
 
-      <ButtonComponent onPress={() => console.log('Botón presionado')} title="Ingresar" />
+
+        </View>
+
+      <BackButtonComponent onPress={handleBack} />
+      
     </View>
+
   );
 };
 
@@ -85,27 +84,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: windowWidth * 0.1,
-    marginBottom: windowHeight * 0.1,
+    padding: windowWidth * 0.1, // 10% del ancho de la pantalla
+    marginBottom: windowHeight * 0.1, // 10% de la altura de la pantalla
   },
+
+
   logo2Container: {
-    marginBottom: windowHeight * 0.02,
-    marginRight: windowWidth * 0.70,
+    marginBottom: windowHeight * 0.02, // 2% de la altura de la pantalla
+    marginRight: windowWidth * 0.70, // 70% del ancho de la pantalla
   },
+
   logo2: {
-    height: windowHeight * 0.05,
-    width: windowWidth * 0.20,
-    marginBottom: windowHeight * 0.04,
+    height: windowHeight * 0.05, // 5% de la altura de la pantalla
+    width: windowWidth * 0.20, // 20% del ancho de la pantalla
+    marginBottom: windowHeight * 0.07, // 4% de la altura de la pantalla
   },
+
   loginText: {
     fontFamily: 'MontserratRegular',
-    fontSize: windowWidth * 0.08,
-    marginBottom: windowHeight * 0.08,
+    fontSize: windowWidth * 0.05, // 8% del ancho de la pantalla
+    marginBottom: windowHeight * 0.12, // 8% de la altura de la pantalla
   },
-  forgotPassword: {
-    color: 'green',
-    marginBottom: windowHeight * 0.08,
+  
+  div: {
+    flex: 25,
+    marginBottom: windowHeight * 0.00,
+    height: windowHeight * 0.13,
   },
+
+  
 });
 
-export default LoginScreen;
+export default ForgotScreen;
