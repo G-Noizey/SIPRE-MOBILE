@@ -49,6 +49,17 @@ const LoginScreen = () => {
     navigation.navigate('ForgotScreen');
   };
 
+
+
+  const handleLoginPress = () => {
+    // Aquí puedes realizar la lógica de autenticación con el servicio de Spring
+    // Si la autenticación es exitosa, navega a la pantalla HomeScreen
+    navigation.navigate('HomeScreen');
+  };
+
+
+  
+
   return (
     <View style={styles.container}>
       <View style={styles.logo2Container}>
@@ -75,7 +86,7 @@ const LoginScreen = () => {
         <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
       </TouchableOpacity>
 
-      <ButtonComponent onPress={() => console.log('Botón presionado')} title="Ingresar" />
+      <ButtonComponent onPress={handleLoginPress} title="Ingresar" />
     </View>
   );
 };

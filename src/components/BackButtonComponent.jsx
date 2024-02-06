@@ -21,7 +21,7 @@ const BackButtonComponent = ({ onPress }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={handleBackPress}>
       <Icon name="arrow-left" size={windowWidth * 0.04} color="white" style={styles.icon} />
-      <Text style={styles.buttonText}>Atrás</Text>
+      <Text style={styles.buttonText}></Text>
     </TouchableOpacity>
   );
 };
