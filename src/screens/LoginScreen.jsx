@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import LogoComponent from '../components/LogoComponent';
 import InputField from '../components/InputFields';
 import ButtonComponent from '../components/ButtonComponent';
