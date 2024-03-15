@@ -1,18 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
-import BottomNavBar from '../navigation/BottomNavBar';
-import RoundedCard from '../components/RoundedCard';
-import MiniCard from '../components/MiniCard';
+import RoundedCard from '../../../../components/RoundedCard';
+import ProfileNavigation from '../../../../components/ProfileNavigation';
+import { useNavigation } from '@react-navigation/native';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
+
+  const navigation = useNavigation();
+
+  const ProfileScreen = () => {
+    navigation.navigate('Profile');
+  }
+
   return (
     <View style={styles.container}>
       {/* Logo */}
       <View style={styles.logo}>
-        <Image source={require('../../assets/images/logo.png')} style={styles.logo2} />
+        <Image source={require('../../../../../assets/images/logo.png')} style={styles.logo2} />
+        <ProfileNavigation
+          name='user-circle'
+          size={40}
+          color='green'
+          onPress={ProfileScreen}
+        />
       </View>
 
       {/* Título */}
@@ -27,36 +40,21 @@ const HomeScreen = ({ navigation }) => {
         <RoundedCard
           title="Cuenta"
           content="BNK1001   ° 822"
-          imageUrl={require('../../assets/images/logo2.png')}
+          imageUrl={require('../../../../../assets/images/logo2.png')}
         />
 
         {/* Texto Movimientos */}
         <Text style={styles.text3}> Movimientos  </Text>
 
-        {/* Contenedor de MiniCards */}
-        <View style={styles.containercard}>
-          <MiniCard     
-            content="Registrar Compra"
-          />
-          <MiniCard        
-            content="Registrar transferencia"
-          />
+        <View style={styles.movimientos}>
+
+          <Text>
+            NO CUENTAS CON MOVIMIENTOS RECIENTES
+          </Text>
+          
         </View>
-
-        {/* Otro contenedor de MiniCards */}
-        <View style={styles.containercard2}>
-          <MiniCard     
-            content="Estado de cuenta"
-          />
-        </View>
-
-        {/* Espacio vacío */}
-        <View style={styles.containerempty}></View>
-
       </View>
 
-      {/* Barra de navegación */}
-      <BottomNavBar navigation={navigation} />
     </View>
   );
 };
@@ -81,7 +79,10 @@ const styles = StyleSheet.create({
   logo: {
     width: windowHeight * 0.10,
     height: windowHeight * 0.10,
-    marginRight: windowWidth * 0.70,
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   logo2: {
     width: windowHeight * 0.08,
@@ -103,22 +104,32 @@ const styles = StyleSheet.create({
   text3: {
     fontFamily: 'MontserratRegular',
     color: 'gray',
-    fontSize: 20
+    fontSize: 20,
+    marginBottom: 30,
+    marginTop: 10
   },
   containercard: {
-    flex:2,
+    flex: 3,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+
   },
   containercard2: {
-    flex: 2,
-    alignItems: 'center',  
-    padding: 50,
-    
+    flex: 3,
+    alignItems: 'center',
+
   },
   containerempty: {
-    flex:1
+    flex: 1
+  },
+  movimientos: {
+    flex: 1,
+    backgroundColor: '#EEEEEE',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
+
 });
 
 export default HomeScreen;

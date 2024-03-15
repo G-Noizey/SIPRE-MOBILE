@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons'; // Importa los iconos necesarios
 
-const MiniCard = ({ content }) => {
+const MiniCard = ({ content, onPress }) => {
   // Función para seleccionar el icono según el texto
   const selectIcon = (text) => {
 
@@ -16,11 +16,11 @@ const MiniCard = ({ content }) => {
       default:
         return <FontAwesome name="question" size={24} color="black" />;
     }
-    
+
   };
 
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       {/* Renderiza el icono seleccionado */}
       {selectIcon(content)}
       <Text style={styles.content}>{content}</Text>

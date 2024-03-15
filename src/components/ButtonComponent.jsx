@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#2D7541',
     paddingVertical: windowWidth * 0.027, // 2.7% del ancho de la pantalla
-    paddingHorizontal: windowWidth * 0.22, // 22% del ancho de la pantalla
+    paddingHorizontal: windowWidth * 0.10, // 22% del ancho de la pantalla
     borderRadius: windowWidth * 0.027, // 2.7% del ancho de la pantalla
     marginTop: windowWidth * 0.048, // 4.8% del ancho de la pantalla
   },

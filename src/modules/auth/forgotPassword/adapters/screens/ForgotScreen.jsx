@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Modal from 'react-native-modal';
+import LogoComponent from '../../../../../components/LogoComponent';
+import InputField from '../../../../../components/InputFields';
+import ButtonComponent from '../../../../../components/ButtonComponent';
+import BackButtonComponent from '../../../../../components/BackButtonComponent';
+import CustomAlert from '../../../../../components/CustomAlert';
 
-import LogoComponent from '../components/LogoComponent';
-import InputField from '../components/InputFields';
-import ButtonComponent from '../components/ButtonComponent';
-import BackButtonComponent from '../components/BackButtonComponent';
 import * as Font from 'expo-font';
 
 const windowWidth = Dimensions.get('window').width;
@@ -17,6 +19,8 @@ const ForgotScreen = () => {
   const [password, setPassword] = useState('');
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const navigation = useNavigation(); // Importa el hook de navegación
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
 
   const handleUsernameChange = (text) => {
     setUsername(text);
@@ -29,8 +33,8 @@ const ForgotScreen = () => {
   useEffect(() => {
     const loadFonts = async () => {
       await Font.loadAsync({
-        MontserratRegular: require('../../assets/fonts/Montserrat-Regular.ttf'),
-        MontserratBold: require('../../assets/fonts/Montserrat-Bold.ttf'),
+        MontserratRegular: require('../../../../../../assets/fonts/Montserrat-Regular.ttf'),
+        MontserratBold: require('../../../../../../assets/fonts/Montserrat-Bold.ttf'),
       });
 
       setFontsLoaded(true);
@@ -50,11 +54,28 @@ const ForgotScreen = () => {
     navigation.navigate('Login');
   };
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handlePress = () => {
+    // Aquí deberías realizar la lógica para enviar el correo
+    // Supongamos que has realizado la lógica y determinas si el correo se envió correctamente o no
+    const emailSentSuccessfully = true; // Supongamos que esto es el resultado de tu lógica
+
+    setIsEmailSent(emailSentSuccessfully);
+    setIsModalVisible(true);
+  };
+
   return (
     <View style={styles.container}>
 
       <View style={styles.logo2Container}>
-        <Image source={require('../../assets/images/logo2.png')} style={styles.logo2} />
+        <Image source={require('../../../../../../assets/images/logo2.png')} style={styles.logo2} />
       </View>
 
       <View style={styles.container}>
@@ -63,17 +84,38 @@ const ForgotScreen = () => {
 
       <Text style={styles.loginText}>Recuperación de contraseña</Text>
 
-      <InputField label="Correo Electrónico:" value={username} onChangeText={handleUsernameChange} placeholder="" />
+      <InputField
+        label="Correo Electrónico:"
+        value={username}
+        onChangeText={handleUsernameChange}
+        placeholder=""
+      />
 
-        <View style={styles.div}>
+      <View>
 
-        <ButtonComponent onPress={() => console.log('Botón presionado')} title="Solicitar" />
+        <ButtonComponent onPress={handlePress} title="Solicitar" />
 
-
-        </View>
+      </View>
 
       <BackButtonComponent onPress={handleBack} />
-      
+
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+        {isEmailSent ? (
+          <CustomAlert
+            type="success"
+            title="¡Correo enviado correctamente!"
+            iconColor="#2D7541"
+            onPress={closeModal}
+          />
+        ) : (
+          <CustomAlert
+            title="¡Formato de correo incorrecto!"
+            iconColor="#BF0C0C"
+            onPress={closeModal}
+          />
+        )}
+      </Modal>
+
     </View>
 
   );
@@ -105,14 +147,14 @@ const styles = StyleSheet.create({
     fontSize: windowWidth * 0.05, // 8% del ancho de la pantalla
     marginBottom: windowHeight * 0.12, // 8% de la altura de la pantalla
   },
-  
+
   div: {
     flex: 25,
     marginBottom: windowHeight * 0.00,
     height: windowHeight * 0.13,
   },
 
-  
+
 });
 
 export default ForgotScreen;
