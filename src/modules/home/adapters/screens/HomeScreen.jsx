@@ -1,8 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Dimensions, Image, AppState } from 'react-native';
 import RoundedCard from '../../../../components/RoundedCard';
 import ProfileNavigation from '../../../../components/ProfileNavigation';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import RecentMovements from '../../../../components/RecentMovements';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -10,14 +13,34 @@ const windowHeight = Dimensions.get('window').height;
 const HomeScreen = () => {
 
   const navigation = useNavigation();
+  const [saldo, setSaldo] = useState(0);
+  const [nuCuenta, setNuCuenta] = useState(0);
 
   const ProfileScreen = () => {
     navigation.navigate('Profile');
   }
 
+  const fetchWorkerSaldo = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem('workerData');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        setSaldo(parsedData.saldo);
+        setNuCuenta(parsedData.nuCuenta);
+      }
+    } catch (error) {
+      console.error('Error al obtener el saldo del trabajador:', error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchWorkerSaldo();
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <View style={styles.logo}>
         <Image source={require('../../../../../assets/images/logo.png')} style={styles.logo2} />
         <ProfileNavigation
@@ -27,34 +50,26 @@ const HomeScreen = () => {
           onPress={ProfileScreen}
         />
       </View>
-
-      {/* Título */}
       <Text style={styles.title}>Línea de crédito</Text>
 
       <View style={styles.content}>
-        {/* Crédito Disponible */}
-        <Text style={styles.text1}>Credito Disponible:</Text>
-        <Text style={styles.text2}> $10,000   </Text>
 
-        {/* Tarjeta redondeada */}
+        <View style={styles.creditContainer}>
+          <Text style={styles.text1}>Crédito Disponible:</Text>
+          <Text style={styles.text2}>${saldo}</Text>
+        </View>
+
         <RoundedCard
           title="Cuenta"
-          content="BNK1001   ° 822"
+          content={nuCuenta}
           imageUrl={require('../../../../../assets/images/logo2.png')}
         />
-
-        {/* Texto Movimientos */}
-        <Text style={styles.text3}> Movimientos  </Text>
+        <Text style={styles.text3}>Movimientos</Text>
 
         <View style={styles.movimientos}>
-
-          <Text>
-            NO CUENTAS CON MOVIMIENTOS RECIENTES
-          </Text>
-          
+          <RecentMovements />
         </View>
       </View>
-
     </View>
   );
 };
@@ -69,11 +84,12 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'MontserratBold',
     fontSize: windowWidth * 0.06,
-    marginBottom: windowHeight * 0.03,
+    marginBottom: windowHeight * 0.01,
     fontSize: 20,
   },
   content: {
     flex: 1,
+    alignItems: 'center',
     width: '100%',
   },
   logo: {
@@ -91,7 +107,6 @@ const styles = StyleSheet.create({
   },
   text1: {
     fontFamily: 'MontserratRegular',
-    marginBottom: windowHeight * 0.03,
     paddingLeft: windowWidth * 0.03,
     fontSize: 15,
     color: 'gray',
@@ -105,8 +120,12 @@ const styles = StyleSheet.create({
     fontFamily: 'MontserratRegular',
     color: 'gray',
     fontSize: 20,
-    marginBottom: 30,
-    marginTop: 10
+    marginBottom: 10,
+  },
+  creditContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    height: 50,
   },
   containercard: {
     flex: 3,
@@ -125,8 +144,9 @@ const styles = StyleSheet.create({
   movimientos: {
     flex: 1,
     backgroundColor: '#EEEEEE',
-    width: '100%',
-    justifyContent: 'center',
+    width: '115%',
+    borderRadius: 10,
+    marginBottom: 30,
     alignItems: 'center',
   }
 

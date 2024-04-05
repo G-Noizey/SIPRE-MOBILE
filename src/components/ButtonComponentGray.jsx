@@ -28,16 +28,19 @@ const styles = StyleSheet.create({
         padding: 10,
         flexDirection: 'row',
         alignItems: 'center',
+        width: 230
     },
     buttonText: {
         color: 'green',
+        flex: 1,
         fontFamily: 'MontserratRegular',
-        textAlign: 'left',
+        textAlign: 'center',
         fontSize: 14
     },
     icon: {
-        marginRight: 10, // Espacio entre el icono y el texto
+        marginRight: 10,
     }
 });
+
 
 export default ButtonComponentGray;

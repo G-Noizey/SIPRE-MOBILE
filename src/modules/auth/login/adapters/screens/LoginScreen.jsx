@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
+import { AppState, View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import LogoComponent from '../../../../../components/LogoComponent';
@@ -10,6 +10,7 @@ import Loading from '../../../../../components/Loading';
 import axios from 'axios';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '@env';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -22,6 +23,7 @@ const LoginScreen = () => {
   const [isLoading, setLoading] = useState(false);
   const [type, setType] = useState('success');
   const navigation = useNavigation();
+  const [workerId, setWorkerId] = useState(null); // Definición de workerId en el estado
 
   const handleUsernameChange = (text) => {
     setUsername(text);
@@ -33,6 +35,7 @@ const LoginScreen = () => {
 
   const handleForgotPasswordPress = () => {
     // Lógica para manejar el olvido de contraseña
+    navigation.navigate('ForgotTabs');
   };
 
   const toggleModal = () => {
@@ -50,7 +53,19 @@ const LoginScreen = () => {
     };
 
     loadFonts();
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
+
+  const handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'active') {
+      setModalVisible(false);
+    }
+  };
 
   if (!fontsLoaded) {
     return null;
@@ -60,7 +75,9 @@ const LoginScreen = () => {
     try {
       setLoading(true);
 
-      const response = await axios.post('http://192.168.92.172:8080/worker/login', {
+      console.log('Enviando solicitud de inicio de sesión:', { userWorker: username, password: password });
+
+      const response = await axios.post(`${API_URL}/worker/login`, {
         userWorker: username,
         password: password,
       });
@@ -70,7 +87,11 @@ const LoginScreen = () => {
       console.log('Respuesta del servidor:', response.data);
 
       if (response.data.error) {
-        setType('default');
+        if (response.data.error === 'El trabajador está inactivo') {
+          setType('warning');
+        } else {
+          setType('default');
+        }
       } else {
         const workerData = {
           name: response.data.name,
@@ -83,22 +104,34 @@ const LoginScreen = () => {
           saldo: response.data.saldo,
           token: response.data.token,
           lastname: response.data.lastname,
+          nuCuenta: response.data.nuCuenta,
           status: response.data.status,
         };
 
         console.log('Datos del trabajador almacenados:', workerData);
         await AsyncStorage.setItem('workerData', JSON.stringify(workerData));
 
-        setType('success');
+        // Aquí obtienes el ID del trabajador
+        const workerId = response.data.id;
+        console.log('ID del trabajador:', workerId);
+
+        // Toggle el modal después de almacenar los datos del trabajador
+        toggleModal();
+
+        setUsername('');
+        setPassword('');
       }
     } catch (error) {
       setLoading(false);
+      console.log('Error en la solicitud de inicio de sesión:', error);
+      if (error.response) {
+        console.log('Respuesta del servidor:', error.response.data);
+      }
       setType('warning');
     }
 
     toggleModal();
-};
-
+  };
 
   const closeModal = () => {
     toggleModal();
@@ -116,7 +149,12 @@ const LoginScreen = () => {
 
       <Text style={styles.loginText}>Iniciar Sesión</Text>
 
-      <InputField label="Usuario:" value={username} onChangeText={handleUsernameChange} placeholder="" />
+      <InputField
+        label="Usuario:"
+        value={username}
+        onChangeText={handleUsernameChange}
+        placeholder=""
+      />
 
       <InputField
         label="Contraseña:"
@@ -125,21 +163,23 @@ const LoginScreen = () => {
         secureTextEntry={true}
         placeholder=""
       />
+      <View style={styles.loginPart}>
+        <TouchableOpacity onPress={handleForgotPasswordPress}>
+          <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleForgotPasswordPress}>
-        <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
-      </TouchableOpacity>
+        <ButtonComponent onPress={handleLoginPress} title="Ingresar" />
 
-      <ButtonComponent onPress={handleLoginPress} title="Ingresar" />
+      </View>
 
       <Loading isShow={isLoading} title="Cargando..." setShow={setLoading} />
 
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal} workerId={workerId} >
         {type === 'success' ? (
           <CustomAlert
             type="success"
             onPress={() => navigation.navigate('HomeTabs')}
-            title="¡Inicio de sesión exitoso!"
+            title="¡Sesión exitosa!"
             iconColor="#2D7541"
           />
         ) : type === 'warning' ? (
@@ -162,7 +202,6 @@ const LoginScreen = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -188,8 +227,12 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     color: 'green',
-    marginBottom: windowHeight * 0.08,
+    marginBottom: 10,
   },
+  loginPart: {
+    alignItems: 'center',
+    marginTop: 10
+  }
 });
 
 export default LoginScreen;

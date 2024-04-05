@@ -10,8 +10,6 @@ import ForgotPasswordStack from '../stack/ForgotPasswordStack'
 import Profile from '../../modules/auth/account/adapters/screens/Profile';
 import BuysScreen from '../../modules/register/shopping/adapters/screens/BuysScreen';
 import TransferScreen from '../../modules/register/transfer/adapters/screens/TransfersScreen';
-import AccountStatus from '../../modules/register/status/adapters/screens/AccountStatus';
-
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,18 +37,10 @@ function MainStackNavigator() {
             />
 
             <Stack.Screen
-                name="AccountStatus"
-                component={AccountStatus}
-                options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
                 name="Profile"
                 component={Profile}
                 options={{ headerShown: false }}
             />
-
-
 
         </Stack.Navigator>
     );
