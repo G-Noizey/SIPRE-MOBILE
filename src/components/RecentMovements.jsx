@@ -6,35 +6,46 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env'
 import { useFocusEffect } from '@react-navigation/native';
 export default function RecentMovements() {
+
     const [movements, setMovements] = useState([]);
 
     const fetchMovements = async () => {
+
         try {
-            const responseTransferencias = await axios.get(`${API_URL}/transfer/all`);
-            const responseCompras = await axios.get(`${API_URL}/buys/all`);
 
-            let counter = 0;
-            const transferenciasConContador = responseTransferencias.data.map(transferencia => ({
-                ...transferencia,
-                tipo: 'Transferencia',
-                contador: counter++
-            }));
+            const storedData = await AsyncStorage.getItem('workerData');
+            if (storedData) {
+                const parsedData = JSON.parse(storedData);
+                const workerId = parsedData.userId;
 
-            const comprasConContador = responseCompras.data.map(compra => ({
-                ...compra,
-                tipo: 'Compra',
-                contador: counter++
-            }));
+                const responseTransferencias = await axios.get(${API_URL}/transfer/all/${workerId});
+                const responseCompras = await axios.get(${API_URL}/buys/all/${workerId});
 
-            const combinedMovements = [...transferenciasConContador, ...comprasConContador].sort((a, b) => {
 
-                return a.contador - b.contador;
-            });
+                let counter = 0;
+                const transferenciasConContador = responseTransferencias.data.map(transferencia => ({
+                    ...transferencia,
+                    tipo: 'Transferencia',
+                    contador: counter++
+                }));
 
-            console.log('Datos:', combinedMovements);
+                const comprasConContador = responseCompras.data.map(compra => ({
+                    ...compra,
+                    tipo: 'Compra',
+                    contador: counter++
+                }));
 
-            setMovements(combinedMovements);
-            await AsyncStorage.setItem('movements', JSON.stringify(combinedMovements));
+                const combinedMovements = [...transferenciasConContador, ...comprasConContador].sort((a, b) => {
+
+                    return a.contador - b.contador;
+                });
+
+                console.log('Datos:', combinedMovements);
+
+                setMovements(combinedMovements);
+                await AsyncStorage.setItem('movements', JSON.stringify(combinedMovements));
+
+            }
         } catch (error) {
             console.error('Error al obtener los movimientos:', error);
         }
