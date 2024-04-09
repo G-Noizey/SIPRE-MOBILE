@@ -5,6 +5,7 @@ import axios from 'axios'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env'
 import { useFocusEffect } from '@react-navigation/native';
+
 export default function RecentMovements() {
 
     const [movements, setMovements] = useState([]);
@@ -18,8 +19,8 @@ export default function RecentMovements() {
                 const parsedData = JSON.parse(storedData);
                 const workerId = parsedData.userId;
 
-                const responseTransferencias = await axios.get(${API_URL}/transfer/all/${workerId});
-                const responseCompras = await axios.get(${API_URL}/buys/all/${workerId});
+                const responseTransferencias = await axios.get(`${API_URL}/transfer/all/${workerId}`);
+                const responseCompras = await axios.get(`${API_URL}/buys/all/${workerId}`);
 
 
                 let counter = 0;
@@ -60,6 +61,7 @@ export default function RecentMovements() {
     const renderMovements = ({ item }) => (
 
         <View style={styles.container}>
+
             <View style={styles.column}>
                 <Text style={{ fontWeight: "bold" }}>Registro de </Text>
                 <Text style={{ fontWeight: "bold" }}>Concepto:</Text>
@@ -78,11 +80,12 @@ export default function RecentMovements() {
 
             <View style={styles.column3}>
                 {item.tipo === 'Transferencia' ? (
-                    <Icon name="exchange" size={30} color={'green'} />
+                    <Icon name="exchange" size={50} color={'green'} />
                 ) : (
-                    <Icon name="shopping-cart" size={30} color={'green'} />
+                    <Icon name="shopping-cart" size={50} color={'green'} />
                 )}
             </View>
+
         </View>
 
     );
@@ -93,6 +96,9 @@ export default function RecentMovements() {
                 data={movements}
                 renderItem={renderMovements}
                 keyExtractor={(item, index) => index.toString()}
+                ListEmptyComponent={() => (
+                    <Text style={styles.noMovementsMessage}>Sin movimientos recientes</Text>
+                )}
             />
         </View>
     );
@@ -101,12 +107,11 @@ export default function RecentMovements() {
 const styles = StyleSheet.create({
 
     container: {
-        flex: 1,
-        flexDirection: "row",
-        height: "100%",
+        flexDirection: 'row',
         padding: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#ccc'
+        borderBottomColor: '#ccc',
+        flexWrap: 'wrap',
     },
     text1: {
         fontFamily: 'MontserratRegular',
@@ -116,16 +121,25 @@ const styles = StyleSheet.create({
     },
     column: {
         flexDirection: 'column',
+        flexShrink: 1,
     },
     column2: {
         flexDirection: 'column',
-        width: 230,
+        flexShrink: 1,
+        width: 212,
     },
     column3: {
         flexDirection: 'column',
+        justifyContent: 'center',
+        width: 50,
     },
     FlatList: {
         flex: 1,
+    },
+    noMovementsMessage: {
+        marginTop: 155,
+        fontSize: 20,
+        color: 'gray',
     },
 
 })

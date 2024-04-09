@@ -89,8 +89,9 @@ const LoginScreen = () => {
       if (response.data.error) {
         if (response.data.error === 'El trabajador está inactivo') {
           setType('warning');
-        } else {
-          setType('default');
+        } else if (response.data.divisionStatus === 'inactive') {
+          setType('inactiveDivision');
+          toggleModal()
         }
       } else {
         const workerData = {
@@ -187,6 +188,13 @@ const LoginScreen = () => {
             type="warning"
             title="¡Advertencia!"
             onPress={closeModal}
+            iconColor="#BF0C0C"
+          />
+        ) : type === 'inactiveDivision' ? (
+          <CustomAlert
+            type="inactiveDivision"
+            onPress={closeModal}
+            title="¡Division Inactiva!"
             iconColor="#BF0C0C"
           />
         ) : (

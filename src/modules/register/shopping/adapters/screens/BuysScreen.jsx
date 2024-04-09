@@ -9,6 +9,8 @@ import Modal from 'react-native-modal';
 import CustomAlert from '../../../../../components/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImageManipulator from 'expo-image-manipulator';
+import Toast from 'react-native-toast-message';
+
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -131,6 +133,13 @@ const BuysScreen = () => {
                 console.log('Imagen comprimida:', manipResult.uri);
 
                 setSelectedImage(uri);
+
+                Toast.show({
+                    type: 'success',
+                    text1: 'Imagen seleccionada',
+                    visibilityTime: 3000, // Duración del mensaje en milisegundos
+                });
+
             } else {
                 console.log('No se seleccionó ninguna imagen');
             }
@@ -183,8 +192,8 @@ const BuysScreen = () => {
                 onDateChange={(date) => setFechaCompra(date.toISOString().split('T')[0])}
                 value={fechaCompra}
             />
-            <ButtonComponent title={"Registrar"} onPress={handlePress} />
             <ButtonComponent title={"Subir comprobante"} onPress={openImagePicker} />
+            <ButtonComponent title={"Registrar"} onPress={handlePress} />
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
                 {isRegisterSent ? (
                     <CustomAlert
@@ -228,8 +237,12 @@ const BuysScreen = () => {
             {selectedImage && (
                 <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
             )}
+            <Toast />
         </View>
+
     );
+
+
 };
 
 const styles = StyleSheet.create({

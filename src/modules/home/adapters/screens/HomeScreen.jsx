@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import RecentMovements from '../../../../components/RecentMovements';
+import axios from 'axios';
+import { API_URL } from '@env';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -25,14 +27,24 @@ const HomeScreen = () => {
       const storedData = await AsyncStorage.getItem('workerData');
       if (storedData) {
         const parsedData = JSON.parse(storedData);
-        setSaldo(parsedData.saldo);
-        setNuCuenta(parsedData.nuCuenta);
+        const workerId = parsedData.userId;
+
+        // Asumiendo que el endpoint del backend devuelve tanto el saldo como el número de cuenta
+        const response = await axios.get(`${API_URL}/worker/${workerId}/details`);
+        const updatedSaldo = response.data.saldo;
+        const updatedNuCuenta = response.data.nuCuenta;
+
+        // Actualizar el estado y AsyncStorage con los datos actualizados
+        setSaldo(updatedSaldo);
+        setNuCuenta(updatedNuCuenta);
+        parsedData.saldo = updatedSaldo;
+        parsedData.nuCuenta = updatedNuCuenta;
+        await AsyncStorage.setItem('workerData', JSON.stringify(parsedData));
       }
     } catch (error) {
-      console.error('Error al obtener el saldo del trabajador:', error);
+      console.error('Error al obtener los detalles del trabajador:', error);
     }
   };
-
   useFocusEffect(
     React.useCallback(() => {
       fetchWorkerSaldo();

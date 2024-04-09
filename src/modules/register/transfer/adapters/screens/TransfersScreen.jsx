@@ -9,6 +9,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from '@env';
+import Toast from 'react-native-toast-message';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -19,11 +20,11 @@ const TransferScreen = () => {
     const [isTransferSent, setIsTransferSent] = useState(false);
     const [concepto, setConcepto] = useState('');
     const [monto, setMonto] = useState('');
-//  const [destinatario, setDestinatario] = useState('');
+    //  const [destinatario, setDestinatario] = useState('');
     const [fechaCompra, setFechaCompra] = useState(new Date().toISOString().split('T')[0]);
     const [showWarningAlert, setShowWarningAlert] = useState(false);
     const [showMontoInvalidoAlert, setShowMontoInvalidoAlert] = useState(false);
-//  const [showDestinatarioInvalidoAlert, setShowDestinatarioInvalidoAlert] = useState(false);
+    //  const [showDestinatarioInvalidoAlert, setShowDestinatarioInvalidoAlert] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [showIncompleteAmountAlert, setShowIncompleteAmountAlert] = useState(false);
 
@@ -105,7 +106,7 @@ const TransferScreen = () => {
                     setIsModalVisible(true);
                     setConcepto('');
                     setMonto('');
-                 // setDestinatario('');
+                    // setDestinatario('');
                     setSelectedImage(null);
                 }
             }
@@ -142,6 +143,13 @@ const TransferScreen = () => {
                 console.log('Imagen comprimida:', manipResult.uri);
 
                 setSelectedImage(manipResult.uri);
+
+                Toast.show({
+                    type: 'success',
+                    text1: 'Imagen seleccionada',
+                    visibilityTime: 3000, // Duración del mensaje en milisegundos
+                });
+
             } else {
                 console.log('No se seleccionó ninguna imagen');
             }
@@ -152,7 +160,7 @@ const TransferScreen = () => {
 
     const validarCampos = () => {
         const regexNumeros = /^[0-9]+$/;
-    //  const regexDestinatario = /^\d{16}$/;
+        //  const regexDestinatario = /^\d{16}$/;
 
         if (!concepto.trim() || !monto.trim() || !fechaCompra || !selectedImage) {
             setShowWarningAlert(true);
@@ -217,9 +225,8 @@ const TransferScreen = () => {
                 value={fechaCompra}
             />
 
-            <ButtonComponent title={"Registrar"} onPress={handlePress} />
-
             <ButtonComponent title={"Subir comprobante"} onPress={openImagePicker} />
+            <ButtonComponent title={"Registrar"} onPress={handlePress} />
 
             <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
                 {isTransferSent ? (
@@ -279,6 +286,7 @@ const TransferScreen = () => {
             {selectedImage && (
                 <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
             )}
+            <Toast />
 
         </View>
     );

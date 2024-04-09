@@ -14,6 +14,8 @@ const CustomAlert = ({ type, onPress, title, iconColor }) => {
             return <Icon name="ban" size={90} color={iconColor} />;
         } else if (type === 'invalidAmount') {
             return <Icon name="frown" size={90} color={iconColor} />;
+        } else if (type === 'inactiveDivision') {
+            return <Icon name="circle-pause" size={90} color={iconColor} />;
         } else {
             return null;
         }
