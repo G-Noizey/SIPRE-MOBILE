@@ -11,6 +11,7 @@ import { API_URL } from '@env';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+
 const Profile = () => {
 
     const [showLoading, setShowLoading] = useState(false);
@@ -33,6 +34,15 @@ const Profile = () => {
             setWorkerData({
                 ...workerData,
                 userWorker: newUsername, // Asegúrate de que este es el campo correcto
+            });
+        }
+    };
+
+    const updatePasswordInWorkerData = (newPassword) => {
+        if (workerData) {
+            setWorkerData({
+                ...workerData,
+                password: newPassword,
             });
         }
     };
@@ -61,6 +71,7 @@ const Profile = () => {
                     setDivisionName(response.data.body.name);
 
                     console.log('Datos del trabajador:', parsedData);
+                    console.log('Contraseña:', parsedData.password);
                     console.log('Nombre de la división:', response.data.body.name);
                 }
             } catch (error) {
@@ -69,6 +80,7 @@ const Profile = () => {
         };
         fetchWorkerData();
     }, []);
+
     return (
         <View style={styles.container}>
 
@@ -138,17 +150,23 @@ const Profile = () => {
                 title="Cambio de contraseña"
                 type='password'
                 onClose={handleCloseModal}
+                onUpdate={updatePasswordInWorkerData}
                 API_URL={API_URL}
-                workerId={workerData ? workerData.userId : null} // Asegúrate de que workerData no sea null
+                workerPassword={workerData ? workerData.password : null}
+                workerId={workerData ? workerData.userId : null}
+                workerUsername={workerData ? workerData.userWorker : null}
             />
+
             <Modal
                 isShow={showLoadingUser}
                 title="Cambio de usuario"
                 type='username'
                 onClose={handleCloseModal}
-                onUpdate={updateUsernameInWorkerData} // Pasar la función como prop
+                onUpdate={updateUsernameInWorkerData}
                 API_URL={API_URL}
+                workerPassword={workerData ? workerData.password : null}
                 workerId={workerData ? workerData.userId : null}
+                workerUsername={workerData ? workerData.userWorker : null}
             />
 
         </View>

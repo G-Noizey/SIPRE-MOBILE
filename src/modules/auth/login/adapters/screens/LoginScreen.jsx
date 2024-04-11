@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { AppState, View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect, } from 'react';
+import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, Alert, AppState } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import LogoComponent from '../../../../../components/LogoComponent';
@@ -23,7 +23,6 @@ const LoginScreen = () => {
   const [isLoading, setLoading] = useState(false);
   const [type, setType] = useState('success');
   const navigation = useNavigation();
-  const [workerId, setWorkerId] = useState(null); // Definición de workerId en el estado
 
   const handleUsernameChange = (text) => {
     setUsername(text);
@@ -34,7 +33,6 @@ const LoginScreen = () => {
   };
 
   const handleForgotPasswordPress = () => {
-    // Lógica para manejar el olvido de contraseña
     navigation.navigate('ForgotTabs');
   };
 
@@ -87,15 +85,11 @@ const LoginScreen = () => {
       console.log('Respuesta del servidor:', response.data);
 
       if (response.data.error) {
-        if (response.data.error === 'El trabajador está inactivo') {
-          setType('warning');
-        } else if (response.data.divisionStatus === 'inactive') {
-          setType('inactiveDivision');
-          toggleModal()
-        }
+        setType('warning');
       } else {
         const workerData = {
           name: response.data.name,
+          password: response.data.password,
           email: response.data.email,
           telefono: response.data.telefono,
           direccion: response.data.direccion,
@@ -106,37 +100,33 @@ const LoginScreen = () => {
           token: response.data.token,
           lastname: response.data.lastname,
           nuCuenta: response.data.nuCuenta,
+          divisionStatus: response.data.divisionStatus,
           status: response.data.status,
         };
 
         console.log('Datos del trabajador almacenados:', workerData);
         await AsyncStorage.setItem('workerData', JSON.stringify(workerData));
 
-        // Aquí obtienes el ID del trabajador
-        const workerId = response.data.id;
-        console.log('ID del trabajador:', workerId);
-
-        // Toggle el modal después de almacenar los datos del trabajador
-        toggleModal();
+        setType('success');
 
         setUsername('');
         setPassword('');
+
       }
     } catch (error) {
       setLoading(false);
       console.log('Error en la solicitud de inicio de sesión:', error);
-      if (error.response) {
-        console.log('Respuesta del servidor:', error.response.data);
-      }
       setType('warning');
     }
 
     toggleModal();
   };
 
+
   const closeModal = () => {
     toggleModal();
   };
+
 
   return (
     <View style={styles.container}>
@@ -175,7 +165,7 @@ const LoginScreen = () => {
 
       <Loading isShow={isLoading} title="Cargando..." setShow={setLoading} />
 
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal} workerId={workerId} >
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
         {type === 'success' ? (
           <CustomAlert
             type="success"
@@ -183,27 +173,12 @@ const LoginScreen = () => {
             title="¡Sesión exitosa!"
             iconColor="#2D7541"
           />
-        ) : type === 'warning' ? (
+        ) : (
           <CustomAlert
             type="warning"
             title="¡Advertencia!"
             onPress={closeModal}
             iconColor="#BF0C0C"
-          />
-        ) : type === 'inactiveDivision' ? (
-          <CustomAlert
-            type="inactiveDivision"
-            onPress={closeModal}
-            title="¡Division Inactiva!"
-            iconColor="#BF0C0C"
-          />
-        ) : (
-          <CustomAlert
-            type="default"
-            onPress={closeModal}
-            title="¡Algo salió mal!"
-            text="El usuario ya no cuenta con acceso a la aplicación"
-            iconColor="#000000"
           />
         )}
       </Modal>

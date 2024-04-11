@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image, AppState } from 'react-native';
 import RoundedCard from '../../../../components/RoundedCard';
 import ProfileNavigation from '../../../../components/ProfileNavigation';
@@ -8,6 +8,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import RecentMovements from '../../../../components/RecentMovements';
 import axios from 'axios';
 import { API_URL } from '@env';
+import CustomAlert from '../../../../components/CustomAlert';
+import Loading from '../../../../components/Loading';
+import Modal from 'react-native-modal';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -17,10 +20,23 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [saldo, setSaldo] = useState(0);
   const [nuCuenta, setNuCuenta] = useState(0);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [modalShown, setModalShown] = useState(true);
+  const [updatedStatus, setUpdatedStatus] = useState(true);
 
   const ProfileScreen = () => {
     navigation.navigate('Profile');
   }
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
 
   const fetchWorkerSaldo = async () => {
     try {
@@ -33,18 +49,36 @@ const HomeScreen = () => {
         const response = await axios.get(`${API_URL}/worker/${workerId}/details`);
         const updatedSaldo = response.data.saldo;
         const updatedNuCuenta = response.data.nuCuenta;
+        const updatedStatus = response.data.divisionStatus;
 
         // Actualizar el estado y AsyncStorage con los datos actualizados
         setSaldo(updatedSaldo);
         setNuCuenta(updatedNuCuenta);
+        setUpdatedStatus(updatedStatus);
+
+        if (updatedStatus === false && parsedData.modalShown !== true) {
+          setModalVisible(true);
+          setModalShown(true);
+          parsedData.modalShown = true; // Actualiza para indicar que el modal ya se ha mostrado
+        }
+
         parsedData.saldo = updatedSaldo;
         parsedData.nuCuenta = updatedNuCuenta;
         await AsyncStorage.setItem('workerData', JSON.stringify(parsedData));
+
       }
     } catch (error) {
       console.error('Error al obtener los detalles del trabajador:', error);
     }
   };
+
+  useEffect(() => {
+    if (updatedStatus === false && !modalShown) {
+      setModalVisible(true);
+      setModalShown(true);
+    }
+  }, [updatedStatus, modalShown]);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchWorkerSaldo();
@@ -82,6 +116,21 @@ const HomeScreen = () => {
           <RecentMovements />
         </View>
       </View>
+
+      <Loading isShow={isLoading} title="Cargando..." setShow={setLoading} />
+
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+
+        <CustomAlert
+          type="inactiveDivision"
+          onPress={closeModal}
+          title="¡Division Inactiva!"
+          iconColor="#BF0C0C"
+        />
+
+      </Modal>
+
+
     </View>
   );
 };

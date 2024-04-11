@@ -4,6 +4,9 @@ import { Overlay } from '@rneui/base';
 import InputField from '../components/InputFields';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import RNModal from 'react-native-modal';
+import CustomAlert from './CustomAlert';
+
 
 export default function Modal(props) {
     const {
@@ -12,12 +15,21 @@ export default function Modal(props) {
         type,
         onClose,
         API_URL,
-        workerId, // Obtén el ID del trabajador como una prop
+        workerId,
+        workerPassword,
+        workerUsername
     } = props;
 
     const [currentValue, setCurrentValue] = useState('');
     const [newValue, setNewValue] = useState('');
     const [confirmNewValue, setConfirmNewValue] = useState('');
+    const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+    const [isEmptyModalVisible, setIsEmptyModalVisible] = useState(false);
+    const [isNotEqualModalVisible, setIsNotEqualModalVisible] = useState(false);
+    const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+    const [isNotEqualActualPasswordModalVisible, setIsNotEqualActualPasswordModalVisible] = useState(false);
+    const [isEqualPasswordModalVisible, setIsEqualPasswordModalVisible] = useState(false);
+    const [isEqualUsernameModalVisible, setIsEqualUsernameModalVisible] = useState(false);
 
     const handleCurrentValueChange = (text) => {
         setCurrentValue(text);
@@ -34,70 +46,93 @@ export default function Modal(props) {
     const handleSubmit = async () => {
         if (type === 'password') {
             if (!currentValue || !newValue || !confirmNewValue) {
-                Alert.alert('Error', 'Por favor complete todos los campos');
+                setIsEmptyModalVisible(true);
                 return;
             }
             if (newValue !== confirmNewValue) {
-                Alert.alert('Error', 'La nueva contraseña y la confirmación no coinciden');
+                setIsNotEqualModalVisible(true);
+                return;
+            }
+
+            if (workerPassword === newValue) {
+                setIsEqualPasswordModalVisible(true);
+                return;
+            }
+
+            if (workerPassword !== currentValue) {
+                setIsNotEqualActualPasswordModalVisible(true);
                 return;
             }
 
             try {
-                console.log('Nueva contraseña:', newValue);
                 const requestData = { password: newValue };
                 const updateResponse = await axios.put(`${API_URL}/worker/${workerId}/password`, requestData);
 
                 if (updateResponse.status === 200) {
-                    console.log('La contraseña se actualizó correctamente');
-                    Alert.alert('Éxito', 'La contraseña se actualizó correctamente');
+                    setIsSuccessModalVisible(true);
                     setCurrentValue('');
                     setNewValue('');
                     setConfirmNewValue('');
+                    if (props.onUpdate) {
+                        props.onUpdate(newValue);
+                    }
                 } else {
-                    console.error('Hubo un problema al actualizar la contraseña');
-                    Alert.alert('Error', 'Hubo un problema al actualizar la contraseña');
+                    setIsWarningModalVisible(true);
                 }
             } catch (error) {
-                console.error('Error al actualizar la contraseña:', error);
-                Alert.alert('Error', 'Hubo un problema al actualizar la contraseña');
+                setIsWarningModalVisible(true);
             }
         } else if (type === 'username') {
             if (!newValue) {
-                Alert.alert('Error', 'Por favor ingrese un nuevo nombre de usuario');
+                setIsEmptyModalVisible(true);
                 return;
             }
 
             try {
-                console.log('Nuevo nombre de usuario:', newValue);
                 const requestData = { userWorker: newValue };
+
+                if (newValue === workerUsername) {
+                    setIsEqualUsernameModalVisible(true);
+                    return;
+                }
+
                 const updateResponse = await axios.put(`${API_URL}/worker/${workerId}/username`, requestData);
 
                 if (updateResponse.status === 200) {
-                    console.log('El nombre de usuario se actualizó correctamente');
-                    Alert.alert('Éxito', 'El nombre de usuario se actualizó correctamente');
+                    setIsSuccessModalVisible(true);
                     setNewValue('');
                     if (props.onUpdate) {
                         props.onUpdate(newValue);
                     }
                 } else {
-                    console.error('Hubo un problema al actualizar el nombre de usuario');
-                    Alert.alert('Error', 'Hubo un problema al actualizar el nombre de usuario');
+                    setIsWarningModalVisible(true);
                 }
             } catch (error) {
-                console.error('Error al actualizar el nombre de usuario:', error);
-                Alert.alert('Error', 'Hubo un problema al actualizar el nombre de usuario');
+                setIsWarningModalVisible(true);
             }
         }
-        onClose();
     };
 
+    const closeModal = () => {
+        setIsSuccessModalVisible(false);
+        setIsWarningModalVisible(false);
+        setIsNotEqualModalVisible(false);
+        setIsEmptyModalVisible(false);
+        setIsNotEqualActualPasswordModalVisible(false);
+        setIsEqualPasswordModalVisible(false);
+        setIsEqualUsernameModalVisible(false);
+        onClose();
+        setCurrentValue('');
+        setNewValue('');
+        setConfirmNewValue('');
+    };
 
     return (
         <Overlay isVisible={isShow} overlayStyle={styles.overlay}>
             <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.title}>{title}</Text>
-                    <TouchableOpacity onPress={onClose}>
+                    <TouchableOpacity onPress={closeModal}>
                         <Ionicons name="close" size={24} color="black" />
                     </TouchableOpacity>
                 </View>
@@ -138,6 +173,72 @@ export default function Modal(props) {
                     <Text style={styles.buttonText}>Guardar cambios</Text>
                 </TouchableOpacity>
             </View>
+
+
+            <RNModal isVisible={isSuccessModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="success"
+                    title="Cambios guardados"
+                    iconColor="#2D7541"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+            <RNModal isVisible={isEmptyModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="emptyFields"
+                    title="¡Faltan campos!"
+                    iconColor="#BF0C0C"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+            <RNModal isVisible={isNotEqualModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="notEqual"
+                    title="¡Las contraseñas no coinciden!"
+                    iconColor="#BF0C0C"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+            <RNModal isVisible={isNotEqualActualPasswordModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="notEqual"
+                    title="¡Contraseña actual incorrecta!"
+                    iconColor="#BF0C0C"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+            <RNModal isVisible={isEqualPasswordModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="notEqual"
+                    title="¡La nueva contraseña debe ser diferente!"
+                    iconColor="#BF0C0C"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+            <RNModal isVisible={isEqualUsernameModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="notEqual"
+                    title="¡El nuevo usuario debe ser diferente!"
+                    iconColor="#BF0C0C"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+            <RNModal isVisible={isWarningModalVisible} onBackdropPress={closeModal}>
+                <CustomAlert
+                    type="warning"
+                    title="!Advertencia!"
+                    iconColor="#BF0C0C"
+                    onPress={closeModal}
+                />
+            </RNModal>
+
+
         </Overlay>
     );
 }
