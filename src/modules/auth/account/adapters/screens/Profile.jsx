@@ -8,21 +8,23 @@ import ProfileNavigation from '../../../../../components/ProfileNavigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_URL } from '@env';
+import CustomAlertClose from '../../../../../components/CustomAlertClose';
+import RNModal from 'react-native-modal';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-
 const Profile = () => {
-
     const [showLoading, setShowLoading] = useState(false);
     const [showLoadingUser, setShowLoadingUser] = useState(false);
     const [workerData, setWorkerData] = useState(null);
     const [divisionName, setDivisionName] = useState('');
+    const [showConfirmLogout, setShowConfirmLogout] = useState(false);
     const navigation = useNavigation();
 
     const handleCloseModal = () => {
         setShowLoading(false);
         setShowLoadingUser(false);
+        setShowConfirmLogout(false); // Closes session confirm modal
     };
 
     const HomeScreen = () => {
@@ -33,7 +35,7 @@ const Profile = () => {
         if (workerData) {
             setWorkerData({
                 ...workerData,
-                userWorker: newUsername, // Asegúrate de que este es el campo correcto
+                userWorker: newUsername,
             });
         }
     };
@@ -45,6 +47,10 @@ const Profile = () => {
                 password: newPassword,
             });
         }
+    };
+
+    const toggleConfirmLogout = () => {
+        setShowConfirmLogout(!showConfirmLogout);
     };
 
     const closeSession = async () => {
@@ -69,10 +75,6 @@ const Profile = () => {
 
                     const response = await axios.get(`${API_URL}/division/${parsedData.divisionId}`);
                     setDivisionName(response.data.body.name);
-
-                    console.log('Datos del trabajador:', parsedData);
-                    console.log('Contraseña:', parsedData.password);
-                    console.log('Nombre de la división:', response.data.body.name);
                 }
             } catch (error) {
                 console.error('Error al obtener los datos del trabajador:', error);
@@ -141,7 +143,10 @@ const Profile = () => {
                     </View>
                 </View>
                 <View style={styles.row}>
-                    <ButtonComponentGray title={"Cerrar sesión"} onPress={closeSession} />
+                    <ButtonComponentGray
+                        title={"Cerrar sesión"}
+                        onPress={toggleConfirmLogout} // Updated to toggle confirmation modal
+                    />
                 </View>
             </View>
 
@@ -168,6 +173,19 @@ const Profile = () => {
                 workerId={workerData ? workerData.userId : null}
                 workerUsername={workerData ? workerData.userWorker : null}
             />
+
+            <RNModal
+                isVisible={showConfirmLogout}
+                onBackdropPress={toggleConfirmLogout}
+            >
+                <CustomAlertClose
+                    type="warning"
+                    onPress={closeSession}
+                    onCancel={toggleConfirmLogout}
+                    title="¿Seguro de cerrar sesión?"
+                    iconColor="#BF0C0C"
+                />
+            </RNModal>
 
         </View>
     );

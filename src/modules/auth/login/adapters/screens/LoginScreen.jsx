@@ -176,7 +176,7 @@ const LoginScreen = () => {
         ) : (
           <CustomAlert
             type="warning"
-            title="¡Advertencia!"
+            title="¡Oops! Algo salió mal"
             onPress={closeModal}
             iconColor="#BF0C0C"
           />

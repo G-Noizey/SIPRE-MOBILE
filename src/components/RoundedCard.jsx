@@ -12,13 +12,6 @@ const RoundedCard = ({ title, content, imageUrl, onPress }) => {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.content}>{content}</Text>
       </View>
-      <View style={styles.containerIcon}>
-        <TouchableOpacity>
-          <View style={styles.button}>
-            <Icon name="receipt" size={20} color="black" onPress={onPress} />
-          </View>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -34,7 +27,7 @@ const styles = StyleSheet.create({
     marginLeft: 35,
   },
   leftSection: {
-    width: 50,
+    width: 60,
     padding: 20,
   },
   image: {
@@ -45,6 +38,7 @@ const styles = StyleSheet.create({
   rightSection: {
     padding: 20,
     flex: 1,
+    justifyContent: 'center',
   },
   title: {
     fontFamily: 'MontserratRegular',
@@ -54,21 +48,8 @@ const styles = StyleSheet.create({
   content: {
     fontFamily: 'MontserratRegular',
     fontSize: 16,
-  },
-  containerIcon: {
-    backgroundColor: 'green',
-    width: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
-  },
-  button: {
-    borderRadius: 20,
-    backgroundColor: 'green',
-    width: 50,
-    height: 96,
-    justifyContent: 'center',
-  },
+    color: 'gray',
+  }
 });
 
 export default RoundedCard;
