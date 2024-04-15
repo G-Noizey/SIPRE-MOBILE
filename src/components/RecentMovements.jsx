@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env'
 import { useFocusEffect } from '@react-navigation/native';
 import Modal from 'react-native-modal';
+import ButtonComponent from './ButtonComponent';
 
 export default function RecentMovements() {
 
@@ -141,9 +142,12 @@ export default function RecentMovements() {
                                     <Text>{selectedMovement.status}</Text>
                                 </Text>
                                 <View style={styles.commentBox}>
+                                <Text style={styles.boldText}>Comentario: </Text>
+
                                     <Text>{selectedMovement.comentario}</Text>
                                 </View>
-                                <Button title="Cerrar" onPress={handleCloseModal} />
+
+                                 <ButtonComponent title="Cerrar"onPress={handleCloseModal}></ButtonComponent>
                             </>
                         )}
                     </View>
@@ -225,12 +229,18 @@ const styles = StyleSheet.create({
     commentBox: {
         marginTop: 10,
         padding: 10,
-        backgroundColor: '#f9f9f9',
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 20,
         marginBottom: 10,
     },
+
+   
+
+
+  
+
+
     boldText: {
         fontWeight: 'bold',
     },

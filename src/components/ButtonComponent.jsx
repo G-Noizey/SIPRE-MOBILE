@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: windowWidth * 0.10, // 22% del ancho de la pantalla
     borderRadius: windowWidth * 0.027, // 2.7% del ancho de la pantalla
     marginTop: windowWidth * 0.048, // 4.8% del ancho de la pantalla
-    width: windowWidth * 0.7, // 80% del ancho de la pantalla
+    width: windowWidth * 0.6, // 80% del ancho de la pantalla
     justifyContent: 'center', // Asegura que el contenido esté centrado verticalmente
   },
   buttonText: {
